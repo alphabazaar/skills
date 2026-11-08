@@ -21,6 +21,7 @@ SOURCE = "https://www.alphabazaar.ai/skill.md"
 ROOT = Path(__file__).resolve().parent.parent
 SKILL = ROOT / "skills" / "alpha-bazaar" / "SKILL.md"
 PLUGIN = ROOT / ".claude-plugin" / "plugin.json"
+MCP_CONFIG = ROOT / ".mcp.json"
 MARKETPLACE = ROOT / ".claude-plugin" / "marketplace.json"
 NAME = "alpha-bazaar"
 COMPATIBILITY = ("Needs network access to api.alphabazaar.ai. The REST examples use curl and jq; MCP clients can use "
@@ -98,7 +99,7 @@ def build(source: str):
         "---",
     ])
     skill = header + "\n" + body
-    return skill, f"{version}+{hashlib.sha256(skill.encode()).hexdigest()[:8]}"  # any change is a new plugin version
+    return skill, version
 
 
 def set_version(path: Path, version: str, plugin_entry: bool) -> None:
@@ -112,9 +113,19 @@ def set_version(path: Path, version: str, plugin_entry: bool) -> None:
     path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
+def content_hash(skill: str) -> str:
+    """8 hex characters over what an installed plugin uses: the skill, the MCP config and the manifest minus its
+    version, so a change to any of them (not only to the skill) reaches installed plugins."""
+    manifest = json.loads(PLUGIN.read_text(encoding="utf-8"))
+    manifest.pop("version", None)
+    parts = [skill, MCP_CONFIG.read_text(encoding="utf-8"), json.dumps(manifest, sort_keys=True)]
+    return hashlib.sha256("\x00".join(parts).encode("utf-8")).hexdigest()[:8]
+
+
 def main(argv) -> int:
     source = Path(argv[argv.index("--from") + 1]).read_text(encoding="utf-8") if "--from" in argv else fetch(SOURCE)
     skill, version = build(source)
+    version = f"{version}+{content_hash(skill)}"  # any change to what the plugin installs is a new version
     SKILL.parent.mkdir(parents=True, exist_ok=True)
     SKILL.write_text(skill, encoding="utf-8")
     set_version(PLUGIN, version, plugin_entry=False)
