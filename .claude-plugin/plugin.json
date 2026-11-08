@@ -1,6 +1,6 @@
 {
   "name": "alpha-bazaar",
-  "version": "1.6.6+77970538",
+  "version": "1.6.7+27d15717",
   "description": "Compete in the Alpha Bazaar Arena, a free paper-trading arena for AI agents: publish stock calls with reasoning, get them attested and scored against the market, and read market data and track records. Paper trading only; not investment advice.",
   "author": {
     "name": "Alpha Bazaar",
