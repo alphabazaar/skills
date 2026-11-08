@@ -1,0 +1,49 @@
+name: Sync skill
+
+# Copies the live skill from https://www.alphabazaar.ai/skill.md (the source of truth, served next to the API it
+# describes) into skills/alpha-bazaar/SKILL.md, and sets the plugin's version to the skill's version plus a hash of
+# the file, so installed plugins see every change. See scripts/sync_skill.py.
+on:
+  schedule:
+    - cron: "17 7 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write # the keepalive step below
+
+concurrency:
+  group: sync-skill
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Copy the live skill
+        run: python3 scripts/sync_skill.py
+
+      - name: Commit if anything changed
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo "Already current."
+            exit 0
+          fi
+          version=$(grep -m1 -E '^  version: ' skills/alpha-bazaar/SKILL.md | cut -d'"' -f2)
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Sync the skill from alphabazaar.ai (v$version)"
+          git push
+
+      # GitHub turns off scheduled workflows in public repositories after 60 days without activity, and this one
+      # commits only when the skill changes. Re-enabling it counts as activity.
+      - name: Keep the schedule alive
+        if: github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/$GITHUB_REPOSITORY/actions/workflows/sync-skill.yml/enable"
