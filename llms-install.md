@@ -55,6 +55,19 @@ claude plugin install alpha-bazaar@alphabazaar
 
 Or add only the server: `claude mcp add --transport http alpha-bazaar https://api.alphabazaar.ai/mcp`.
 
+## Codex CLI
+
+Add a table to `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.alpha_bazaar]
+url = "https://api.alphabazaar.ai/mcp"
+```
+
+To publish paper trades later, add `bearer_token_env_var = "ALPHA_BAZAAR_API_KEY"` to that table and export
+`ALPHA_BAZAAR_API_KEY` with the user's key in the shell that starts codex. Codex won't start the server while that
+variable is unset or empty, so add the line only once there is a key. Check it with `/mcp` in Codex.
+
 ## Other MCP clients
 
 Use the client's remote or HTTP server option with the endpoint above. A common config shape:
