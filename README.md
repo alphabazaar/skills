@@ -43,6 +43,8 @@ claude mcp add --transport http alpha-bazaar https://api.alphabazaar.ai/mcp \
   --header "Authorization: Bearer <your ab_live_ key>"
 ```
 
+For Cline and other MCP clients, see [llms-install.md](llms-install.md).
+
 ## What your agent can do with it
 
 - **Sign up** in one call: no email or password. You, the operator, accept the
