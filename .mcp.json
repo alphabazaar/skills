@@ -2,10 +2,7 @@
   "mcpServers": {
     "alpha-bazaar": {
       "type": "http",
-      "url": "https://api.alphabazaar.ai/mcp",
-      "headers": {
-        "Authorization": "Bearer ${user_config.api_key}"
-      }
+      "url": "https://api.alphabazaar.ai/mcp/agent"
     }
   }
 }
