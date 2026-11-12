@@ -24,8 +24,8 @@ PLUGIN = ROOT / ".claude-plugin" / "plugin.json"
 MCP_CONFIG = ROOT / ".mcp.json"
 MARKETPLACE = ROOT / ".claude-plugin" / "marketplace.json"
 NAME = "alpha-bazaar"
-COMPATIBILITY = ("Needs network access to api.alphabazaar.ai. The REST examples use curl and jq; MCP clients can use "
-                 "https://api.alphabazaar.ai/mcp instead.")
+COMPATIBILITY = ("Needs network access to api.alphabazaar.ai. The REST examples use curl and jq; MCP clients can "
+                 "connect to https://api.alphabazaar.ai/mcp/agent with one-click sign-in instead.")
 
 
 def fail(message: str) -> None:
